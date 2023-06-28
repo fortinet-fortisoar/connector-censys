@@ -1,0 +1,118 @@
+{
+  "name": "censys",
+  "label": "Censys",
+  "description": "This connector allows for information to be pulled from the Censys search engine",
+  "publisher": "CyberSponse Community",
+  "cs_approved": false,
+  "cs_compatible": true,
+  "version": "1.0.0",
+  "category": "Information",
+  "icon_small_name": "Censys_32X32.png",
+  "icon_large_name": "Censys_80X80.png",
+  "help_online": "https://help.cybersponse.com/support/solutions/articles/17000076187-censys-v1-0-0",
+  "configuration": {
+    "fields": [
+      {
+        "title": "Server URL",
+        "description": "URL of the Censys API server to which you will connect and perform the automated operation",
+        "required": true,
+        "editable": true,
+        "visible": true,
+        "type": "text",
+        "name": "url",
+        "value": "https://www.censys.io"
+      },
+      {
+        "title": "Customer Key",
+        "description": "Secret key to access the Censys API.",
+        "required": true,
+        "editable": true,
+        "visible": true,
+        "type": "text",
+        "name": "customerKey"
+      },
+      {
+        "title": "Verify SSL",
+        "required": true,
+        "editable": true,
+        "visible": true,
+        "type": "checkbox",
+        "name": "verify"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "operation": "lookup_cert",
+      "category": "investigation",
+      "annotation": "lookup_cert",
+      "output_schema": {
+        "status_code": "integer",
+        "response": {}
+      },
+      "title": "Lookup Certificate",
+      "description": "Lookup a certificate on Censys",
+      "enabled": true,
+      "parameters": [
+        {
+          "title": "Certificate",
+          "name": "sha256_cert",
+          "description": "SHA256 Certificate which you want to search and retrieve information.",
+          "type": "text",
+          "visible": true,
+          "editable": true,
+          "required": true,
+          "tooltip": "SHA256 Certificate about which information is needed"
+        }
+      ]
+    },
+    {
+      "operation": "lookup_domain",
+      "category": "investigation",
+      "annotation": "lookup_domain",
+      "output_schema": {
+        "status_code": "integer",
+        "response": {}
+      },
+      "title": "Lookup Domain",
+      "description": "Lookup a domain on Censys",
+      "enabled": true,
+      "parameters": [
+        {
+          "title": "Domain",
+          "decription": "Domain which you want to seatch and retrieve information.",
+          "name": "domain",
+          "type": "text",
+          "visible": true,
+          "editable": true,
+          "required": true,
+          "tooltip": "Domain about which information is needed"
+        }
+      ]
+    },
+    {
+      "operation": "lookup_ip",
+      "category": "investigation",
+      "annotation": "lookup_ip",
+      "output_schema": {
+        "status_code": "integer",
+        "response": {}
+      },
+      "title": "Lookup IP Address",
+      "description": "Lookup an IP Address on Censys",
+      "enabled": true,
+      "parameters": [
+        {
+          "title": "IP Address",
+          "description": "IP Address which you want to search and retrieve information.",
+          "name": "ipaddr",
+          "type": "text",
+          "visible": true,
+          "editable": true,
+          "required": true,
+          "tooltip": "IP address to fetch information about"
+        }
+      ]
+    }
+  ]
+}
