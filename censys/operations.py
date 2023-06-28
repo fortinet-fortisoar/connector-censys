@@ -1,96 +1,98 @@
-from connectors.core.connector import get_logger, ConnectorError, _api_call
+""" Copyright start
+  Copyright (C) 2008 - 2023 Fortinet Inc.
+  All rights reserved.
+  FORTINET CONFIDENTIAL & FORTINET PROPRIETARY SOURCE CODE
+  Copyright end """
+
+import validators, requests, json
+import base64
+from connectors.core.connector import get_logger, ConnectorError
 
 logger = get_logger('censys')
 
-'''
-    These lookup_x functions all look very similar to one another.
-    They are kept separate so that the outputs can be cleaned up based on
-    the different outputs from their api calls.
 
-    See the commented lines in lookup_cert for an example of this
-'''
+class Censys(object):
+    def __init__(self, config):
+        self.server_url = config.get('server_url')
+        if not self.server_url.startswith('https://'):
+            self.server_url = 'https://' + self.server_url
+        if not self.server_url.endswith('/'):
+            self.server_url += '/'
+        self.api_id = config.get('api_id')
+        self.api_secret = config.get('api_secret')
+        self.verify_ssl = config.get('verify_ssl')
 
-error_msgs = {
-    400: 'Bad/Invalid Request',
-    401: 'Unauthorized: Invalid credentials provided failed to authorize',
-    403: 'Access Denied',
-    404: 'Not Found',
-    500: 'Internal Server Error',
-    503: 'Service Unavailable',
-    'time_out': 'The request timed out while trying to connect to the remote server',
-    'ssl_error': 'SSL certificate validation failed'
-}
+    def make_api_call(self, endpoint=None, method='GET', data=None, params=None):
+        try:
+            url = self.server_url + endpoint
+            b64_credential = base64.b64encode((self.api_id + ":" + self.api_secret).encode('utf-8')).decode()
+            headers = {'Authorization': "Basic " + b64_credential, 'Accept': 'application/json'}
+            response = requests.request(method, url, params=params, data=data, headers=headers, verify=self.verify_ssl)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(response.text)
+                raise ConnectorError({'status_code': response.status_code, 'message': response.reason})
+        except requests.exceptions.SSLError:
+            raise ConnectorError('SSL certificate validation failed')
+        except requests.exceptions.ConnectTimeout:
+            raise ConnectorError('The request timed out while trying to connect to the server')
+        except requests.exceptions.ReadTimeout:
+            raise ConnectorError('The server did not send any data in the allotted amount of time')
+        except requests.exceptions.ConnectionError:
+            raise ConnectorError('Invalid endpoint or credentials')
+        except Exception as err:
+            logger.exception(str(err))
+            raise ConnectorError(str(err))
 
 
-def lookup_domain(config, params):
+def get_params(params):
+    params = {k: v for k, v in params.items() if v is not None and v != ''}
+    return params
+
+
+def get_host_details(config, params):
     try:
-        domain = params.get("domain")
-        url = "{0}/api/v1/view/websites/{1}".format(config.get("url"), domain)
-        request_status, request_result = _api_call(url, method='GET')
-        return {"status_code": request_status, "response": request_result}
-    except Exception as e:
-        error_message = "Error looking up domain. Error message as follows:\n{}".format(str(e))
-        logger.error(error_message)
-        raise ConnectorError(error_message)
+        csys = Censys(config)
+        if params.get('at_time'):
+            params['at_time'] = params.get('at_time').replace('T', ' ')
+        params = get_params(params)
+        return csys.make_api_call(endpoint='api/v2/hosts/{0}'.format(params.get('ip')), params=params)
+    except Exception as err:
+        logger.exception(str(err))
+        raise ConnectorError(str(err))
 
 
-def lookup_cert(config, params):
+def search_hosts(config, params):
     try:
-        sha256_cert = params.get("sha256_cert")
-
-        url = "{0}/api/v1/view/certificates/{1}".format(config.get("url"), sha256_cert)
-        request_status, request_result = _api_call(url, method='GET')
-
-        # The lines below can be used to return a more focused subset of the data in request_result
-
-        # cert = request_result.get("parsed")
-        # cert_validity = cert.get("validity")
-        # cert_info = {"valid_from": cert_validity.get("start"),
-        #             "valid_to": cert_validity.get("end")}
-        # cert_info["self_signed"] = cert.get("self_signed")
-        # cert_info["issuer_dn"] = cert.get("issuer").get("common_name")
-        # cert_info["subject_dn"] = cert.get("subject").get("common_name")
-        if request_status == 200:
-            return {"status_code": request_status, "response": request_result}
-        else:
-            raise ConnectorError('{}'.format(error_msgs[request_status]))
-    except Exception as e:
-        error_message = "Error looking up certificate. Error message as follows:\n{}".format(str(e))
-        logger.error(error_message)
-        raise ConnectorError(error_message)
+        csys = Censys(config)
+        params = get_params(params)
+        return csys.make_api_call(endpoint='api/v2/hosts/search', params=params)
+    except Exception as err:
+        logger.exception(str(err))
+        raise ConnectorError(str(err))
 
 
-def lookup_ip(config, params):
+def lookup_certificate(config, params):
     try:
-        ipaddr = params.get("ipaddr")
-        url = "{0}/api/v1/view/ipv4/{1}".format(config.get("url"), ipaddr)
-        request_status, request_result = _api_call(url, method='GET')
-        if request_status == 200:
-            return {"status_code": request_status, "response": request_result}
-        else:
-            raise ConnectorError('{}'.format(error_msgs[request_status]))
-    except Exception as e:
-        error_message = "Error looking up IP address. Error message as follows:\n{}".format(str(e))
-        logger.error(error_message)
-        raise ConnectorError(error_message)
+        csys = Censys(config)
+        return csys.make_api_call(endpoint='api/v2/certificates/{0}'.format(params.get('fingerprint')),
+                                  params=params)
+    except Exception as err:
+        logger.exception(str(err))
+        raise ConnectorError(str(err))
 
 
-def check_health(config):
+def _check_health(config):
     try:
-        request_status, request_result = lookup_domain(config, params={"domain": "cybersponse.com"})
-        if request_status == 200:
-            return True
-        else:
-            raise ConnectorError('{}'.format(error_msgs[request_status]))
-    except Exception as e:
-        error_message = "Error in health check. Error message as follows:\n{}".format(str(e))
-        logger.error(error_message)
-        raise ConnectorError(error_message)
+        return get_host_details(config, params={'ip': '8.8.8.8'})
+    except Exception as err:
+        logger.exception(str(err))
+        raise ConnectorError(str(err))
 
 
 operations = {
-    'lookup_domain': lookup_domain,
-    'lookup_cert': lookup_cert,
-    'lookup_ip': lookup_ip,
-    'check_health': check_health
+    'get_host_details': get_host_details,
+    'search_hosts': search_hosts,
+    'lookup_certificate': lookup_certificate
 }

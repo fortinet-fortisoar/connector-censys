@@ -1,26 +1,25 @@
-from connectors.core.connector import Connector
-from connectors.core.connector import get_logger, ConnectorError
+""" Copyright start
+  Copyright (C) 2008 - 2023 Fortinet Inc.
+  All rights reserved.
+  FORTINET CONFIDENTIAL & FORTINET PROPRIETARY SOURCE CODE
+  Copyright end """
 
-from .operations import operations
+from connectors.core.connector import Connector, get_logger, ConnectorError
+from .operations import operations, _check_health
 
 logger = get_logger('censys')
 
 
-class Censys(Connector):
+class WhoisXMLAPI(Connector):
     def execute(self, config, operation, params, **kwargs):
-        try:
-            action = operations.get(operation)
-            result = {}
-
-            result = action(config, params)
-            return result
-        except Exception as e:
-            error_message = "Error in execute(). Error message as follows: {0}".format(str(e))
-            raise ConnectorError(error_message)
+        action = operations.get(operation)
+        logger.info('executing {0}'.format(action))
+        return action(config, params)
 
     def check_health(self, config):
         try:
-            return operations.get("check_health")(config)
-        except Exception as e:
-            error_message = "Error in Health check. Error message as follows: {0}".format(str(e))
-            raise ConnectorError(error_message)
+            logger.info('executing check health')
+            return _check_health(config)
+        except Exception as err:
+            logger.exception(str(err))
+            raise ConnectorError(str(err))
