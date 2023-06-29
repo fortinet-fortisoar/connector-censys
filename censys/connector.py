@@ -10,7 +10,7 @@ from .operations import operations, _check_health
 logger = get_logger('censys')
 
 
-class WhoisXMLAPI(Connector):
+class Censys(Connector):
     def execute(self, config, operation, params, **kwargs):
         action = operations.get(operation)
         logger.info('executing {0}'.format(action))
