@@ -2,11 +2,11 @@
   "name": "censys",
   "label": "Censys",
   "version": "2.0.0",
-  "description": "This connector allows for information to be pulled from the Censys search engine",
+  "description": "Censys is a search engine that focuses on providing comprehensive information about devices and systems connected to the Internet. It is specifically designed to help researchers, security professionals, and organizations gain insights into various aspects of the global Internet infrastructure. Censys employs a variety of techniques to continuously scan and analyze the Internet, collecting data on IP addresses, websites, certificates, open ports, and other network-related information. This extensive dataset allows users to search for specific devices, services, or vulnerabilities, helping them understand the security posture of different entities on the Internet.",
   "publisher": "Fortinet",
   "cs_approved": false,
   "cs_compatible": false,
-  "category": "Information",
+  "category": "Threat Intelligence",
   "icon_small_name": "Censys_32X32.png",
   "icon_large_name": "Censys_80X80.png",
   "help_online": "",
@@ -20,7 +20,7 @@
         "type": "text",
         "name": "server_url",
         "value": "https://search.censys.io",
-        "description": "The URL of the Censys server to which you will connect and perform the automated operations."
+        "description": "The URL of the Censys server to connect and perform the automated operations"
       },
       {
         "title": "API ID",
@@ -29,7 +29,7 @@
         "visible": true,
         "type": "password",
         "name": "api_id",
-        "description": "The API ID used to access the Censys server to which you will connect and perform the automated operations."
+        "description": "The API ID used to access the Censys server to connect and perform the automated operations"
       },
       {
         "title": "API Secret",
@@ -38,7 +38,7 @@
         "visible": true,
         "type": "password",
         "name": "api_secret",
-        "description": "The API Secret used to access the Censys server to which you will connect and perform the automated operations."
+        "description": "The API Secret used to access the Censys server to connect and perform the automated operations"
       },
       {
         "title": "Verify SSL",
@@ -48,7 +48,7 @@
         "type": "checkbox",
         "name": "verify_ssl",
         "value": true,
-        "description": "Specifies whether the SSL certificate for the server is to be verified or not. By default, this option is set as True."
+        "description": "Specifies whether the SSL certificate for the server is to be verified.By default, this option is set to true"
       }
     ]
   },
@@ -56,7 +56,7 @@
     {
       "operation": "get_host_details",
       "title": "Get Host Details Using IP Address",
-      "description": "Fetches the entire host entity by IP address and returns the most recent Censys view of the host and its services",
+      "description": "Fetches the entire host entity by IP address and returns the most recent Censys view of the host and its services based on the IP address that you have specified",
       "enabled": true,
       "category": "investigation",
       "annotation": "get_host_details",
@@ -153,7 +153,7 @@
           "title": "IP Address",
           "name": "ip",
           "type": "text",
-          "description": "The IP Address of the requested host",
+          "description": "Specify the IP Address of the requested host",
           "tooltip": "The IP Address of the requested host",
           "required": true,
           "editable": true,
@@ -163,8 +163,8 @@
           "title": "Since Date",
           "name": "at_time",
           "type": "datetime",
-          "description": "Fetches the Censys view of a host and its services at the specified point in time. Uses RFC3339 Timestamp",
-          "tooltip": "Fetches the Censys view of a host and its services at the specified point in time. Uses RFC3339 Timestamp",
+          "description": "Select the date from which to fetch the Censys view of a host and its services. Uses RFC3339 Timestamp",
+          "tooltip": "Select the date from which to fetch the Censys view of a host and its services. Uses RFC3339 Timestamp",
           "required": false,
           "editable": true,
           "visible": true
@@ -270,8 +270,8 @@
           "title": "Censys Search Query",
           "name": "q",
           "type": "text",
-          "description": "Query used to search for hosts with matching attributes. Uses the Censys Search Language",
-          "tooltip": "Query used to search for hosts with matching attributes. Uses the Censys Search Language",
+          "description": "Specify a query to search for and filter hosts with matching attributes. Uses the Censys Search Language",
+          "tooltip": "Specify a query to search for and filter hosts with matching attributes. Uses the Censys Search Language",
           "placeholder": "dns.google.com or services.service_name:HTTP",
           "required": true,
           "editable": true,
@@ -281,8 +281,8 @@
           "title": "Max Hits",
           "name": "per_page",
           "type": "text",
-          "description": "The maximum number of hits to return in each response (minimum of 1, maximum of 100). Default value : 50",
-          "tooltip": "The maximum number of hits to return in each response (minimum of 1, maximum of 100). Default value : 50",
+          "description": "Specify the maximum number of hits to return in each response. You can specify a minimum value of 1 and a maximum value of 100. The default value is 50",
+          "tooltip": "Specify the maximum number of hits to return in each response. You can specify a minimum value of 1 and a maximum value of 100. The default value is 50",
           "required": false,
           "editable": true,
           "visible": true
@@ -296,8 +296,8 @@
             "INCLUDE",
             "ONLY"
           ],
-          "description": "Determine how to query Virtual Hosts. The default is EXCLUDE which will ignore any virtual hosts entries. When set to INCLUDE or ONLY virtual hosts will be present in the returned list of hits, with the later returning only virtual hosts. Default value : EXCLUDE",
-          "tooltip": "Determine how to query Virtual Hosts. The default is EXCLUDE which will ignore any virtual hosts entries. When set to INCLUDE or ONLY virtual hosts will be present in the returned list of hits, with the later returning only virtual hosts. Default value : EXCLUDE",
+          "description": "Select the action to take when querying virtual hosts. You can select from following options: EXCLUDE(Default): Select this option to exclude the virtual hosts in the search results. INCLUDE: Select this option to include the virtual hosts in the search results. ONLY: Select this option to return only the virtual hosts in the search results.",
+          "tooltip": "Select the action to take when querying virtual hosts. You can select from following options: EXCLUDE(Default): Select this option to exclude the virtual hosts in the search results. INCLUDE: Select this option to include the virtual hosts in the search results. ONLY: Select this option to return only the virtual hosts in the search results.",
           "required": false,
           "editable": true,
           "visible": true,
@@ -307,8 +307,8 @@
           "title": "Cursor",
           "name": "cursor",
           "type": "text",
-          "description": "Cursor token from the API response, which fetches the next or previous page of hits when added to the endpoint URL",
-          "tooltip": "Cursor token from the API response, which fetches the next or previous page of hits when added to the endpoint URL",
+          "description": "Specify the cursor token from the API response to fetch the next or previous page of hits. The token is added to the endpoint URL to get the pages specified by this token",
+          "tooltip": "Specify the cursor token from the API response to fetch the next or previous page of hits. The token is added to the endpoint URL to get the pages specified by this token",
           "required": false,
           "editable": true,
           "visible": true
@@ -317,8 +317,8 @@
           "title": "Fields",
           "name": "fields",
           "type": "text",
-          "description": "Comma separated list of up to 25 fields to be returned for each result",
-          "tooltip": "Comma separated list of up to 25 fields to be returned for each result",
+          "description": "Specify a comma-separated list of up to 25 fields to be returned for each result",
+          "tooltip": "Specify a comma-separated list of up to 25 fields to be returned for each result",
           "required": false,
           "editable": true,
           "visible": true
@@ -719,8 +719,8 @@
           "title": "SHA-256 Fingerprint",
           "name": "fingerprint",
           "type": "text",
-          "description": "The SHA-256 fingerprint of the requested certificate",
-          "tooltip": "The SHA-256 fingerprint of the requested certificate",
+          "description": "Specify the SHA256 certificate to search and retrieve information from Censys",
+          "tooltip": "Specify the SHA256 certificate to search and retrieve information from Censys",
           "required": true,
           "editable": true,
           "visible": true
