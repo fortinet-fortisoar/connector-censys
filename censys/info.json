@@ -9,7 +9,7 @@
   "category": "Threat Intelligence",
   "icon_small_name": "Censys_32X32.png",
   "icon_large_name": "Censys_80X80.png",
-  "help_online": "",
+  "help_online": "https://docs.fortinet.com/document/fortisoar/2.0.0/censys/629/censys-v2-0-0",
   "configuration": {
     "fields": [
       {
